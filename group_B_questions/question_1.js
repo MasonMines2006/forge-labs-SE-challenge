@@ -1,3 +1,11 @@
+const readline = require('readline');
+
+// Create an interface to read from stdin and write to stdout
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});y
+
 class item {
     constructor(title, description, date_created, date_due, status = "New", importance = "Med") {
         this.title = title;
@@ -80,6 +88,7 @@ class todolist {
         if (index !== -1 && newIndex >= 0 && newIndex < this.items.length) {
             const [item] = this.items.splice(index, 1); // Remove the item
             this.items.splice(newIndex, 0, item); // Insert it at new index
+            console.log("Change successful");
         } else {
             console.log("Invalid index or item not found.");
         }
@@ -95,18 +104,32 @@ class todolist {
         switch (edit_type) {
             case "title":
                 item.setTitle(change);
+                console.log("Change successful");
                 break;
             case "description":
                 item.setDescription(change);
+                console.log("Change successful");
                 break;
             case "date_due":
                 item.setDateDue(change);
+                console.log("Change successful");
                 break;
             case "status":
                 item.setStatus(change);
+                if (item.status === "Finished") {
+                    // Use readline to ask user for input
+                    rl.question("Remove item? (y/n) ", (userInput) => {
+                        if (userInput === "y") {
+                            this.deleteItem(item.title);
+                        }
+                        console.log("Change successful");
+                        rl.close(); // Close the readline interface after use
+                    });
+                }
                 break;
             case "importance":
                 item.setImportance(change);
+                console.log("Change successful");
                 break;
             default:
                 console.log("Edit type not recognized");
@@ -114,20 +137,23 @@ class todolist {
     }
 }
 
-
-const myList = new todolist();
+function test_toDoList() {
+    const myList = new todolist();
 
 // Add items
-myList.add_item("Buy groceries", "Milk, Eggs, Bread", "2023-12-20");
-myList.add_item("Clean house", "Dusting and vacuuming", "2023-12-21");
+    myList.add_item("Buy groceries", "Milk, Eggs, Bread", "2023-12-20");
+    myList.add_item("Clean house", "Dusting and vacuuming", "2023-12-21");
 
 // Edit an item
-myList.editList("Buy groceries", "status", "Working On");
+    myList.editList("Buy groceries", "importance", "High");
 
 // Reorganize list
-myList.reorganizeList("Clean house", 0);
+    myList.reorganizeList("Clean house", 0);
 
 // Delete an item
-myList.deleteItem("Buy groceries");
+    myList.editList("Buy groceries", "status", "Finished");
 
-console.log(myList.items);
+    console.log(myList.items);
+}
+
+test_toDoList()
