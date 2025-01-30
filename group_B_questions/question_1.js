@@ -1,24 +1,57 @@
-// Question 1:
-// My brand new startup wants to build a better online productivity tracker. We think that current trackers are far too complicated, and we want to make something that is a simple to-do list.
-//
-//     Without worrying about design/HTML, write the functions needed to make this to-do list workable.
-//
-//     Write the JavaScript functions to make this to-do list functional. Please do not write any HTML or use frameworks like jQuery. The list should be saved as an array of objects. Imagine each piece of functionality would be triggered by a button that called the corresponding function.
-//
-// The requirements for the to do list are:
-// To Do items should have properties of title, description, date created, date due, and its status (New, Working on, Finished).
-// The ability to add and delete items
-// The ability to reorganize the list (i.e. bring one to top, send down 1, etc)
-// The ability to edit information about each task where appropriate
-// Any additional functionality you can think of is highly encouraged, but keep in mind the to do list is supposed to be simple.
-
 class item {
-    constructor(title, description, date_created, date_due, status) {
+    constructor(title, description, date_created, date_due, status = "New", importance = "Med") {
         this.title = title;
         this.description = description;
         this.date_created = date_created;
         this.date_due = date_due;
-        this.status = status;
+
+        const valid_status = ["New", "Working On", "Finished"];
+        if (valid_status.includes(status)) {
+            this.status = status;
+        } else {
+            console.log("Invalid status. Setting to 'New'");
+            this.status = "New";
+        }
+
+        const valid_importance = ["Low", "Med", "High"];
+        if (valid_importance.includes(importance)) {
+            this.importance = importance;
+        } else {
+            console.log("Invalid importance. Setting to 'Med'");
+            this.importance = "Med";
+        }
+    }
+
+    setTitle(title) {
+        this.title = title;
+    }
+
+    setDescription(description) {
+        this.description = description;
+    }
+
+    setDateDue(date_due) {
+        this.date_due = date_due;
+    }
+
+    setStatus(status) {
+        const valid_status = ["New", "Working On", "Finished"];
+        if (valid_status.includes(status)) {
+            this.status = status;
+        } else {
+            console.log("Invalid status. Setting to 'New'");
+            this.status = "New";
+        }
+    }
+
+    setImportance(importance) {
+        const valid_importance = ["Low", "Med", "High"];
+        if (valid_importance.includes(importance)) {
+            this.importance = importance;
+        } else {
+            console.log("Invalid importance. Setting to 'Med'");
+            this.importance = "Med";
+        }
     }
 }
 
@@ -26,11 +59,13 @@ class todolist {
     constructor() {
         this.items = [];
     }
+
     add_item(title, description, date_due) {
         const date_created = new Date();
-        const item1 = new item(title, description, date_created, date_due = "New");
-        this.items.push(item1)
+        const newItem = new item(title, description, date_created, date_due);
+        this.items.push(newItem);
     }
+
     deleteItem(title) {
         const index = this.items.findIndex(item => item.title === title);
         if (index !== -1) {
@@ -39,14 +74,60 @@ class todolist {
             console.log("Item not found!");
         }
     }
-    reorganizeList(title, index) {
-        if (index > this.items.length) {
-            console.log("Couldn't re-order list");
+
+    reorganizeList(title, newIndex) {
+        const index = this.items.findIndex(item => item.title === title);
+        if (index !== -1 && newIndex >= 0 && newIndex < this.items.length) {
+            const [item] = this.items.splice(index, 1); // Remove the item
+            this.items.splice(newIndex, 0, item); // Insert it at new index
         } else {
-            const index = this.items.findIndex(item => item.title === title);
-            if (index !== -1) {
-                const item = this.items.splice(index, 1)[0]; // Remove the item
-            }
+            console.log("Invalid index or item not found.");
+        }
+    }
+
+    editList(title, edit_type, change) {
+        const item = this.items.find(item => item.title === title);
+        if (!item) {
+            console.log("Item not found!");
+            return;
+        }
+
+        switch (edit_type) {
+            case "title":
+                item.setTitle(change);
+                break;
+            case "description":
+                item.setDescription(change);
+                break;
+            case "date_due":
+                item.setDateDue(change);
+                break;
+            case "status":
+                item.setStatus(change);
+                break;
+            case "importance":
+                item.setImportance(change);
+                break;
+            default:
+                console.log("Edit type not recognized");
         }
     }
 }
+
+
+const myList = new todolist();
+
+// Add items
+myList.add_item("Buy groceries", "Milk, Eggs, Bread", "2023-12-20");
+myList.add_item("Clean house", "Dusting and vacuuming", "2023-12-21");
+
+// Edit an item
+myList.editList("Buy groceries", "status", "Working On");
+
+// Reorganize list
+myList.reorganizeList("Clean house", 0);
+
+// Delete an item
+myList.deleteItem("Buy groceries");
+
+console.log(myList.items);
